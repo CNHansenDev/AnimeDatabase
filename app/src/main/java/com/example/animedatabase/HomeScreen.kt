@@ -26,8 +26,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
@@ -56,31 +58,30 @@ import androidx.compose.ui.unit.sp
 import androidx.room.util.copy
 import com.example.animedatabase.R
 import kotlin.math.roundToInt
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+    val dynamicFontSize = (screenWidth * 0.04).sp
+
     Box(
         modifier = Modifier
             .fillMaxSize()
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp)
-        ) {
-            items(dummyAnimeList) { anime -> AnimeItem(anime)
-            }
-        }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp)
         ) {
+            // Top Bar with Title and Icons
             Row(
                 modifier = Modifier
-                    .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    .fillMaxWidth()
+                    .padding(8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.logo),
@@ -92,13 +93,21 @@ fun HomeScreen() {
                         .padding(4.dp)
                 )
 
+                Text(
+                    "AnimeDatabase",
+                    fontSize = dynamicFontSize * 1.5,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .padding(4.dp)
+                )
+
                 Row (
                     horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(
                         onClick = { },
                         modifier = Modifier
-                            .size (60.dp)
+                            .size(50.dp)
                             .clip(CircleShape)
                             .background(Color.White)
                             .padding(4.dp)
@@ -116,7 +125,7 @@ fun HomeScreen() {
                     IconButton(
                         onClick = { },
                         modifier = Modifier
-                            .size(60.dp)
+                            .size(50.dp)
                             .clip(CircleShape)
                             .background(Color.White)
                             .padding(4.dp)
@@ -130,30 +139,44 @@ fun HomeScreen() {
                 }
             }
 
+            // Spacer to push content below
             Spacer(modifier = Modifier.weight(1f))
 
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                items(dummyAnimeList) { anime -> AnimeItem(anime)}
+            }
+        }
+
+        // **Buttons Positioned at the Bottom**
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter) // Aligns to bottom of screen
+                .padding(bottom = 16.dp) // Add some space from the bottom
+        ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 OutlinedButton(
-                    onClick = { },
+                    onClick = { navController.navigate("watched") },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     border = BorderStroke(3.dp, color = Color.Black),
                     modifier = Modifier
-                        .padding(2.dp)
                         .width(165.dp)
                         .height(50.dp)
                 ) {
                     Text("Watched List", color = Color.Black)
                 }
                 OutlinedButton(
-                    onClick = { },
+                    onClick = { navController.navigate("to_watch") },
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White),
                     border = BorderStroke(3.dp, color = Color.Black),
                     modifier = Modifier
-                        .padding(2.dp)
                         .width(165.dp)
                         .height(50.dp)
                 ) {
@@ -286,5 +309,6 @@ fun convertPercentageToStars(percentage: Int): Triple<Int, Boolean, Int> {
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    HomeScreen()
+    val navController = rememberNavController()
+    HomeScreen(navController = navController)
 }
