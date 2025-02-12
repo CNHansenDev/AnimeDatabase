@@ -88,7 +88,7 @@ fun ToWatchListScreen(navController: NavController) {
                         Icon(Icons.Default.Home, contentDescription = "Home", Modifier.fillMaxSize())
                     }
                     IconButton(
-                        onClick = { },
+                        onClick = { navController.navigate("search") },
                         modifier = Modifier
                             .size(50.dp)
                             .padding(4.dp)

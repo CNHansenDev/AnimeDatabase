@@ -1,6 +1,7 @@
 package com.example.animedatabase
 
 import HomeScreen
+import SearchScreen
 import ToWatchListScreen
 import WatchedListScreen
 import android.os.Bundle
@@ -38,5 +39,6 @@ fun AppNavigation() {
         composable("home") { HomeScreen(navController) }
         composable("watched") { WatchedListScreen(navController) }
         composable("to_watch") { ToWatchListScreen(navController) }
+        composable("search") { SearchScreen(navController)}
     }
 }

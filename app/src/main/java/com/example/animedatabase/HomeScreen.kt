@@ -105,7 +105,7 @@ fun HomeScreen(navController: NavController) {
                     horizontalArrangement = Arrangement.End
                 ) {
                     IconButton(
-                        onClick = { },
+                        onClick = { navController.navigate("search") },
                         modifier = Modifier
                             .size(50.dp)
                             .clip(CircleShape)

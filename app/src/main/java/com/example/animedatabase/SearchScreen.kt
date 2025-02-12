@@ -16,8 +16,13 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +43,7 @@ fun SearchScreen(navController: NavController) {
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val dynamicFontSize = (screenWidth * 0.04).sp
+    var searchQuery by remember { mutableStateOf(" ") }
 
     Box(
         modifier = Modifier
@@ -70,12 +76,13 @@ fun SearchScreen(navController: NavController) {
                     )
                 }
 
-                Text(
-                    "Search",
-                    fontSize = dynamicFontSize * 1.5,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier
-                        .padding(4.dp)
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    label = { Text("Search") },
+                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search Icon") },
+                    singleLine = true,
+                    modifier = Modifier.width(220.dp)
                 )
 
                 Row(horizontalArrangement = Arrangement.End) {
@@ -86,14 +93,6 @@ fun SearchScreen(navController: NavController) {
                             .padding(4.dp)
                     ) {
                         Icon(Icons.Default.Home, contentDescription = "Home", Modifier.fillMaxSize())
-                    }
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .size(50.dp)
-                            .padding(4.dp)
-                    ) {
-                        Icon(Icons.Filled.Search, contentDescription = "Search", modifier = Modifier.fillMaxSize())
                     }
                     IconButton(
                         onClick = { },
@@ -155,7 +154,9 @@ fun SearchScreen(navController: NavController) {
 }
 
 // Example Watched List Data (Modify as needed)
-val searchList = listOf()
+val searchList = listOf(
+    Anime("One Piece", R.drawable.one_piece, 88)
+)
 
 @Preview(showBackground = true)
 @Composable
