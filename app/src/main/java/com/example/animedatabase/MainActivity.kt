@@ -40,5 +40,6 @@ fun AppNavigation() {
         composable("watched") { WatchedListScreen(navController) }
         composable("to_watch") { ToWatchListScreen(navController) }
         composable("search") { SearchScreen(navController)}
+        composable("profile") { ProfileScreen(navController) }
     }
 }

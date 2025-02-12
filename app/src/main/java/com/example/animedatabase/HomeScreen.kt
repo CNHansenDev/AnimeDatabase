@@ -140,7 +140,7 @@ fun HomeScreen(navController: NavController) {
                     Spacer(modifier = Modifier.width(8.dp))
 
                     IconButton(
-                        onClick = { },
+                        onClick = { navController.navigate("profile") },
                         modifier = Modifier
                             .size(50.dp)
                             .clip(CircleShape)

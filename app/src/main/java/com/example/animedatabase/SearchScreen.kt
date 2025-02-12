@@ -95,7 +95,7 @@ fun SearchScreen(navController: NavController) {
                         Icon(Icons.Default.Home, contentDescription = "Home", Modifier.fillMaxSize())
                     }
                     IconButton(
-                        onClick = { },
+                        onClick = { navController.navigate("profile") },
                         modifier = Modifier
                             .size(50.dp)
                             .padding(4.dp)
