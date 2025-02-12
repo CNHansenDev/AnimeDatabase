@@ -42,6 +42,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,9 +64,22 @@ import com.example.animedatabase.R
 import kotlin.math.roundToInt
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.animedatabase.LoginDialogue
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    var showDialogue by remember { mutableStateOf(true) } // Show login dialog initially
+
+    if (showDialogue) {
+        LoginDialogue(
+            onDismiss = { showDialogue = false }, // Close dialog on guest mode
+            onLogin = { email, password ->
+                // Handle login logic (e.g., call a login API)
+                println("Logging in with: $email")
+                showDialogue = false
+            }
+        )
+    }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp
     val dynamicFontSize = (screenWidth * 0.04).sp
