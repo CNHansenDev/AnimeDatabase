@@ -1,8 +1,10 @@
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +27,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -41,13 +46,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.room.util.copy
 import com.example.animedatabase.R
+import kotlin.math.roundToInt
 
 @Composable
 fun HomeScreen() {
@@ -157,58 +165,122 @@ fun HomeScreen() {
 }
 
 //Placeholder for future anime api microservice
-data class Anime(val title: String, @DrawableRes val imageRes: Int)
+data class Anime(val title: String, @DrawableRes val imageRes: Int, val rating: Int)
 
 val dummyAnimeList = listOf(
-    Anime("Naruto", R.drawable.naruto),
-    Anime("One Piece", R.drawable.one_piece),
-    Anime("Attack on Titan", R.drawable.attack_on_titan),
-    Anime("Demon Slayer", R.drawable.demon_slayer),
-    Anime("Full Metal Alchemist: Brotherhood", R.drawable.full_metal_alchemist_brotherhood),
-    Anime("Hunter x Hunter", R.drawable.hunter_x_hunter),
-    Anime("My Hero Academia", R.drawable.my_hero_academia),
-    Anime("Dragon Ball Z", R.drawable.dragon_ball_z),
-    Anime("Dragon Ball", R.drawable.dragon_ball),
-    Anime("Cowboy Bebop", R.drawable.cowboy_bebop),
-    Anime("Baccano!", R.drawable.baccano),
-    Anime("Neon Genesis Evangelion", R.drawable.neon_genesis_evangelion),
-    Anime("Mob Psycho 100", R.drawable.mob_psycho_100),
-    Anime("Hajime No Ippo", R.drawable.hajime_no_ippo),
-    Anime("Monster", R.drawable.monster),
-    Anime("Samurai Champloo", R.drawable.samurai_champloo),
+    Anime("Naruto", R.drawable.naruto, 75),
+    Anime("One Piece", R.drawable.one_piece, 88),
+    Anime("Attack on Titan", R.drawable.attack_on_titan, 84),
+    Anime("Demon Slayer", R.drawable.demon_slayer, 56),
+    Anime("Full Metal Alchemist: Brotherhood", R.drawable.full_metal_alchemist_brotherhood, 92),
+    Anime("Hunter x Hunter", R.drawable.hunter_x_hunter, 88),
+    Anime("My Hero Academia", R.drawable.my_hero_academia, 75),
+    Anime("Dragon Ball Z", R.drawable.dragon_ball_z, 45),
+    Anime("Dragon Ball", R.drawable.dragon_ball, 72),
+    Anime("Cowboy Bebop", R.drawable.cowboy_bebop, 87),
+    Anime("Baccano!", R.drawable.baccano, 34),
+    Anime("Neon Genesis Evangelion", R.drawable.neon_genesis_evangelion, 63),
+    Anime("Mob Psycho 100", R.drawable.mob_psycho_100, 90),
+    Anime("Hajime No Ippo", R.drawable.hajime_no_ippo, 80),
+    Anime("Monster", R.drawable.monster, 68),
+    Anime("Samurai Champloo", R.drawable.samurai_champloo, 72),
 )
 
 @Composable
 fun AnimeItem(anime: Anime) {
+    val configuration = LocalConfiguration.current
+    val screenWidth = configuration.screenWidthDp
+    val dynamicFontSize = (screenWidth * 0.04).sp
+    val (fullStars, hasHalfStar, emptyStars) = convertPercentageToStars(anime.rating)
+
     Card(
         modifier = Modifier
-            .fillMaxSize()
             .padding(8.dp)
-            .aspectRatio(2f/3f)
-            .height(200.dp),
+            .width(150.dp) // Ensures all boxes have the same width
+            .height(220.dp), // Ensures all boxes have the same height
         shape = RoundedCornerShape(8.dp),
-        elevation = CardDefaults.elevatedCardElevation(4.dp)
+        border = BorderStroke(2.dp, Color.Gray), // Optional: Border around the box
+        elevation = CardDefaults.elevatedCardElevation(10.dp),
     ) {
-        Box{
-            Image(
-                painter = painterResource(id = anime.imageRes),
-                contentDescription = anime.title,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row(
+                modifier = Modifier.padding(bottom = 4.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(fullStars) {
+                    Image(
+                        painter = painterResource(id = R.drawable.star),
+                        contentDescription = "Full Star",
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+
+                // Half star
+                if (hasHalfStar) {
+                    Image(
+                        painter = painterResource(id = R.drawable.half_star),
+                        contentDescription = "Half Star",
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+
+                // Empty stars
+                repeat(emptyStars) {
+                    Image(
+                        painter = painterResource(id = R.drawable.star_outline),
+                        contentDescription = "Empty Star",
+                        modifier = Modifier.size(14.dp)
+                    )
+                }
+                Text(
+                    modifier = Modifier
+                        .padding(2.dp, 1.dp),
+                    text = "${anime.rating.toString()}%",
+                    color = Color.Black,
+                    fontSize = dynamicFontSize / 1.3,
+                )
+            }
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(2f / 3f), // Maintains aspect ratio
+                shape = RoundedCornerShape(8.dp),
+                elevation = CardDefaults.elevatedCardElevation(4.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = anime.imageRes),
+                    contentDescription = anime.title,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Fit
+                )
+
+            }
+
+            Spacer(modifier = Modifier.height(4.dp)) // Space between image and text
+
             Text(
                 text = anime.title,
-                color = Color.White,
-                fontSize = 20.sp,
+                color = Color.Black,
+                fontSize = dynamicFontSize,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(8.dp)
-                    .background(Color.Black.copy(alpha = 0.7f))
-                    .padding(4.dp)
+                modifier = Modifier.padding(top = 4.dp),
             )
         }
     }
+}
+
+fun convertPercentageToStars(percentage: Int): Triple<Int, Boolean, Int> {
+    val fullStars = percentage / 20 // Full stars (each representing 20%)
+    val hasHalfStar = (percentage % 20) >= 10 // If the remainder is 10 or more, we consider a half star
+    val emptyStars = 5 - fullStars - (if (hasHalfStar) 1 else 0) // The rest are empty stars
+
+    return Triple(fullStars, hasHalfStar, emptyStars)
 }
 
 @Preview(showBackground = true)
